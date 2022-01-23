@@ -6,7 +6,6 @@ module.exports = async function (bot) {
             case 'getMessages':
                 await getMessages(bot, msg)
                 break;
-        
             default:
                 break;
         }
