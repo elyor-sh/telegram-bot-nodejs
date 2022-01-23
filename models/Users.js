@@ -6,7 +6,9 @@ const schema = new Schema ({
     userName: {type: String},
     is_bot: {type: Boolean, default: false},
     type: {type: String},
-    languageCode: {type: String, default: ''}
+    languageCode: {type: String, default: ''},
+    len: {type: Number, default: 0},
+    unknownMessages: {type: Array, default: []}
 })
 
 module.exports = model('User', schema)

@@ -1,44 +1,58 @@
-const Messages = require("../models/Messages")
 const Users = require("../models/Users")
 
-module.exports = async function (chatId, bot, msg){
+module.exports = async function (chatId, bot, msg) {
 
     try {
 
-        await bot.sendMessage(chatId,  `Sizni tushuna olmayapman!`)
+        await bot.sendMessage(chatId, `Sizni tushuna olmayapman!`)
 
-        const messages = Messages.findOne({owner: msg.from.id})
+        const user = await Users.findOne({ chatId })
 
-        const user = Users.findOne({chatId: msg.from.id})
+        if (!user) {
 
-        console.log(messages)
-        console.log(user)
+            const newUser = new Users(
+                {
+                    chatId: chatId,
+                    firstName: msg.from.first_name ? msg.from.first_name : '',
+                    userName: msg.from.username ? msg.from.username : '',
+                    type: msg.chat.type ? msg.chat.type : '',
+                    isBot: is_bot,
+                    languageCode: language_code,
+                    len: 1,
+                    unknownMessages: [msg.text]
+                }
+            )
 
-        let texts = []
-        let count = 0
-        if(messages && messages.text && messages.len){
-            texts = messages.text
-            count = messages.len
+            await newUser.save()
+
+            return false
         }
 
-        if(count <= 50){
-            texts.push(msg.text)
-            count++
-        }else {
-            texts.shift()
-            texts.push(msg.text)
+        const {firstName, userName, is_bot, type} = user
+
+        if (user.len >= 50) {
+
+            const arr = [...user.unknownMessages]
+
+            arr.shift()
+
+            arr.push(msg.text)
+
+            const newUser = {chatId, firstName, userName, is_bot, type, unknownMessages: arr, len: 50 }
+
+            await Users.findByIdAndUpdate(user._id, newUser, {new: true})
+
+            return false
         }
 
-        let newMessages = {}
+        const arr = [...user.unknownMessages]
 
-        if(messages && messages.text && messages.len && messages._id){
-             newMessages = {...messages, text: texts, len: count}
-             await Messages.findByIdAndUpdate(messages._id, newMessages, {new: true})
-        }else{
-            newMessages = new Messages({text: texts, len: count, owner: msg.from.id})
-            await newMessages.save()
-        }
-        
+        arr.push(msg.text)
+
+        const newUser = {chatId, firstName, userName, is_bot, type, len: user.len + 1, unknownMessages: arr, }
+
+        await Users.findByIdAndUpdate(user._id, newUser, {new: true})
+
     } catch (error) {
         console.log(error)
     }
