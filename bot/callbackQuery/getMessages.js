@@ -5,9 +5,7 @@ module.exports = async function (bot, msg){
 
     try {
 
-        // console.log(msg.message)
-
-        const { type } = msg.message.chat
+        const { type } = msg.chat ? msg.chat : msg.message.chat
 
         const sendMessage = async (text) =>{
             await bot.sendMessage(msg.message.chat.id, text)
