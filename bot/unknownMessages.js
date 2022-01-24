@@ -7,6 +7,10 @@ module.exports = async function (chatId, bot, msg) {
 
         const { type } = msg.chat
 
+        if(!msg.text){
+            return
+        }
+
         if (type === 'private') {
 
             await bot.sendMessage(chatId, `Sizni tushuna olmayapman!`)
