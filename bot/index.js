@@ -22,23 +22,34 @@ module.exports = async function () {
         const text = msg.text
         const chatId = msg.chat.id
 
-        switch (text) {
-            case '/start':
-                await start(bot, chatId, msg)
-                return
-            case '/info':
-                await info(bot, chatId, msg)
-                return
-            case '/unknownmessage':
-                await message(bot, chatId, msg)
-                return
-            case '/deleteunknownmessage':
-                await deleteUnknownMessages(bot, chatId, msg)
-                return
-            default:
-                await unknownMessages(chatId, bot, msg)
-                return
+        const isMatch = (arg) => {
+            const regex = new RegExp(`/${arg}(.+)`)
+            const regex2 = new RegExp(`/${arg} (.+)`)
+            return (regex.test(text) || regex2.test(text) || text === `/${arg}`)
         }
+
+        if(isMatch('start')){
+            await start(bot, chatId, msg)
+            return
+        }
+
+        if(isMatch('info')){
+            await info(bot, chatId, msg)
+            return
+        }
+
+        if(isMatch('unknownmessage')){
+            await message(bot, chatId, msg)
+            return
+        }
+        
+        if(isMatch('deleteunknownmessage')){
+            await deleteUnknownMessages(bot, chatId, msg)
+            return
+        }
+
+        return unknownMessages(chatId, bot, msg)
+
     })
 
     callbackQuery(bot)
