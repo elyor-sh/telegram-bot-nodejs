@@ -16,8 +16,8 @@ module.exports = async function (chatId, bot, msg) {
                     firstName: msg.from.first_name ? msg.from.first_name : '',
                     userName: msg.from.username ? msg.from.username : '',
                     type: msg.chat.type ? msg.chat.type : '',
-                    isBot: is_bot,
-                    languageCode: language_code,
+                    is_bot: msg.from.is_bot,
+                    languageCode: msg.from.language_code,
                     len: 1,
                     unknownMessages: [msg.text]
                 }
