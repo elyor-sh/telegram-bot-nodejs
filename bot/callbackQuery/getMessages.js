@@ -6,10 +6,6 @@ module.exports = async function (bot, msg){
     try {
 
         const { type } = msg.chat ? msg.chat : msg.message.chat
-
-        const sendMessage = async (text) =>{
-            await bot.sendMessage(msg.message.chat.id, text)
-        }
     
         if(type === 'private'){
     
@@ -21,11 +17,9 @@ module.exports = async function (bot, msg){
             }
         
             const {unknownMessages} = user
+
+            await bot.sendMessage(msg.message.chat.id, JSON.stringify(unknownMessages, null, 4))
         
-            unknownMessages.map(item => {
-                sendMessage(item)
-            })
-    
         }
     
         const chat = await Chats.findOne({chatId: msg.message.chat.id})
@@ -40,11 +34,7 @@ module.exports = async function (bot, msg){
             return bot.sendMessage(msg.message.chat.id, `Xabarlar topilmadi!`)
           }
 
-        console.log(unknownMessages)
-        
-        unknownMessages.map(item => {
-            sendMessage(item)
-        })
+        await bot.sendMessage(msg.message.chat.id, JSON.stringify(unknownMessages, null, 4))
         
     } catch (error) {
         console.log(error)

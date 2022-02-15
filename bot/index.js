@@ -1,5 +1,6 @@
 const TelegramApi = require('node-telegram-bot-api')
 const Chats = require('../models/Chats')
+const ban = require('./ban')
 const callbackQuery = require('./callbackQuery')
 const deleteUnknownMessages = require('./deleteUnknownMessages')
 const info = require('./info')
@@ -23,57 +24,18 @@ module.exports = async function () {
         const text = msg.text
         const chatId = msg.chat.id
 
-        
-
-        const isQuloq = () => {
-            const regex1 = new RegExp(`qulo (.+)`)
-            const regex2 = new RegExp(`quloq (.+)`)
-            const regex3 = new RegExp(`qulo(.+)`)
-            const regex4 = new RegExp(`quloq(.+)`)
-
-            let newWord = msg.text.replace(/[^a-zа-яё]/gi, '').split('')
-            newWord = Array.from(new Set(newWord))
-
-            let arr = newWord.map(item => {
-              return  item.toString().toLowerCase()
-            })
-
-            arr = Array.from(new Set(arr))
-
-            arr = arr.join('')
-
-            let newQuloq = arr.split('').join(' ')
-
-            if(newQuloq && newQuloq.includes('qulo')){
-                return true
-            }
-
-
-            return (text.toLowerCase() === 'quloq' ||
-                    text.toLowerCase() === 'qulo' ||
-                    regex1.test(text.toLowerCase()) ||
-                    regex2.test(text.toLowerCase()) ||
-                    regex3.test(text.toLowerCase()) ||
-                    regex4.test(text.toLowerCase()) ||
-                    arr === 'quloq' ||
-                    arr === 'qulo' ||
-                    regex1.test(arr) ||
-                    regex2.test(arr) ||
-                    regex3.test(arr) ||
-                    regex4.test(arr) 
-            )
-
-            
-        }
-
         const isMatch = (arg) => {
             const regex = new RegExp(`/${arg}(.+)`)
             const regex2 = new RegExp(`/${arg} (.+)`)
             return (regex.test(text) || regex2.test(text) || text === `/${arg}`)
         }
 
-        if(isQuloq()){
-            await bot.sendMessage(chatId, `<i>Guruhda <b>QULOQ</b> so'zi taqiqlangan❌</i>`, {parse_mode: 'HTML'})
+        if(ban(msg)){
+            console.log(msg)
+            await bot.sendMessage(chatId, `<i>Guruhda <b>QULOQ</b> so'zi taqiqlangan❌</i>`, {parse_mode: 'HTML', reply_to_message_id: msg.message_id})
+            await bot.banChatMember(chatId, msg.from.id, {
+                until_date: Math.round((Date.now() + 60000)/1000)
+            })
             return
         }
 
