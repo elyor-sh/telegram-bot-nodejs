@@ -2,6 +2,7 @@ const TelegramApi = require('node-telegram-bot-api')
 const Chats = require('../models/Chats')
 const ban = require('./ban')
 const callbackQuery = require('./callbackQuery')
+const clearChat = require('./clearChat')
 const deleteUnknownMessages = require('./deleteUnknownMessages')
 const info = require('./info')
 const message = require('./message')
@@ -31,12 +32,17 @@ module.exports = async function () {
         }
 
         if(ban(msg)){
-            console.log(msg)
             await bot.sendMessage(chatId, `<i>Guruhda <b>QULOQ</b> so'zi taqiqlangan❌</i>`, {parse_mode: 'HTML', reply_to_message_id: msg.message_id})
-            await bot.banChatMember(chatId, msg.from.id, {
-                until_date: Math.round((Date.now() + 60000)/1000)
-            })
+            if(msg.from.id !== 1467016852){
+                await bot.banChatMember(chatId, msg.from.id, {
+                    until_date: Math.round((Date.now() + 60000)/1000)
+                })
+            }
             return
+        }
+
+        if(msg.chat && msg.chat.type === 'supergroup'){
+            await clearChat(bot, msg)
         }
 
         if(isMatch('start')){
