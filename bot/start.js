@@ -42,6 +42,8 @@ module.exports = async function (bot, chatId, msg) {
 
         await Chats.findByIdAndUpdate(oldChat._id, obj, {new: true})
 
+        return bot.sendPhoto(chatId, path.join(__dirname + '/..' + '/static/codeinventors.jpg'), {caption: "@codeinventors kanali botiga xush kelibsiz!"})
+
 
     } catch (error) {
         console.log(error)
